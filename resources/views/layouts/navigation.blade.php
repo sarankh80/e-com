@@ -24,6 +24,12 @@
                     <x-nav-link :href="route('slides.index')" :active="request()->routeIs('slides.index')">
                         {{ __('Slides') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('slides.index')" :active="request()->routeIs('groups.index')">
+                        {{ __('Groups') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                        {{ __('Users') }}
+                    </x-nav-link>
                 </div>
             </div>
 

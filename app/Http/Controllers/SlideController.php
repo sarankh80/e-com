@@ -1,64 +1,72 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Models\Slide;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class SlideController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $slides = Slide::latest()->get();
+        return view('slide.index', compact('slides'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('slide.add');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'title_kh' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'description' => 'nullable|string',
+        ]);
+
+        $slide = new Slide();
+        $slide->title = $request->title;
+        $slide->title_kh = $request->title_kh;
+        $slide->description = $request->description;
+        $slide->slug = Str::slug($request->title) . '-' . rand(1000, 9999);
+        $slide->is_active = $request->has('is_active');
+
+        if ($request->hasFile('image')) {
+            $slide->image = $request->file('image')->store('slides', 'public');
+        }
+
+        $slide->save();
+        return redirect()->route('slides.index')->with('success', 'Slide created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Slide $slide)
     {
-        //
+        return view('slide.edit', compact('slide'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, Slide $slide)
     {
-        //
-    }
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        $slide->title = $request->title;
+        $slide->title_kh = $request->title_kh;
+        $slide->description = $request->description;
+        $slide->is_active = $request->has('is_active');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($slide->image) { Storage::disk('public')->delete($slide->image); }
+            $slide->image = $request->file('image')->store('slides', 'public');
+        }
+
+        $slide->save();
+        return redirect()->route('slide.index')->with('success', 'Slide updated!');
     }
 }

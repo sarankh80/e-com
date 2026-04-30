@@ -26,5 +26,6 @@ Route::middleware('auth')->group(function () {
 Route::resource('products', \App\Http\Controllers\ProductController::class)->middleware('auth');
 Route::resource('categories', \App\Http\Controllers\CategoryController::class)->middleware('auth');
 Route::resource('slides', \App\Http\Controllers\SlideController::class)->middleware('auth');
+Route::resource('users', \App\Http\Controllers\UserController::class)->middleware('auth');
 
 require __DIR__.'/auth.php';
