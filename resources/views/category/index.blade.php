@@ -7,8 +7,9 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <a href="{{ route('categories.create') }}" class="bg-black-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded fl"> {{ __('Create Category') }}</a>
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <a href="{{ route('categories.create') }}" class="bg-black-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded m-2 float-right"> {{ __('Create Category') }}</a>
+            <br>
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mt-4">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="overflow-x-auto">
                        <table class="table table-bordered w-full text-left text-sm text-gray-500 dark:text-gray-400 border-collapse  border-gray-300 dark:border-gray-600" id="categories-table">

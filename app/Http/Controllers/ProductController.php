@@ -1,64 +1,80 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('product.index');
+        $products = Product::with('category')->latest()->paginate(10);
+        return view('product.index', compact('products'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $categories = Category::all();
+        return view('product.add', compact('categories'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'image' => 'nullable|image|max:2048',
+        ]);
+
+        $data = $request->all();
+        $data['slug'] = Str::slug($request->name) . '-' . time();
+        $data['is_active'] = $request->has('is_active');
+        $data['is_featured'] = $request->has('is_featured');
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        Product::create($data);
+
+        return redirect()->route('products.index')->with('success', 'Product created!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Product $product)
     {
-        //
+        $categories = Category::all();
+        return view('product.edit', compact('product', 'categories'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, Product $product)
     {
-        //
-    }
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'category_id' => 'nullable|exists:categories,id',
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        $data = $request->all();
+        
+        if($request->name !== $product->name) {
+            $data['slug'] = Str::slug($request->name) . '-' . time();
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $data['is_active'] = $request->has('is_active');
+        $data['is_featured'] = $request->has('is_featured');
+
+        if ($request->hasFile('image')) {
+            if ($product->image) Storage::disk('public')->delete($product->image);
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($data);
+
+        return redirect()->route('products.index')->with('success', 'Product updated!');
     }
 }
