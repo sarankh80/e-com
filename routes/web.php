@@ -27,5 +27,7 @@ Route::resource('products', \App\Http\Controllers\ProductController::class)->mid
 Route::resource('categories', \App\Http\Controllers\CategoryController::class)->middleware('auth');
 Route::resource('slides', \App\Http\Controllers\SlideController::class)->middleware('auth');
 Route::resource('users', \App\Http\Controllers\UserController::class)->middleware('auth');
+Route::resource('roles', \App\Http\Controllers\GroupController::class)->middleware('auth');
+Route::resource('permissions', \App\Http\Controllers\PermissionController::class)->middleware('auth');
 
 require __DIR__.'/auth.php';

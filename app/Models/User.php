@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -40,4 +41,35 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    function factory(): UserFactory
+    {
+        return new UserFactory();
+    }
+    function hasRole($role): bool
+    {
+        return $this->roles()->where('name', $role)->exists();
+    }
+    function hasPermissionTo($permission): bool
+    {
+        return $this->permissions()->where('name', $permission)->exists() ||
+               $this->roles()->whereHas('permissions', function ($query) use ($permission) {
+                   $query->where('name', $permission);
+               })->exists();
+    }
+    function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'model_has_permissions', 'model_id', 'permission_id');
+    }
+    function roles()
+    {
+        return $this->belongsToMany(Role::class, 'model_has_roles', 'model_id', 'role_id');
+    }
+    function assignRole($role): void
+    {
+        $this->roles()->attach($role);
+    }
+    function givePermissionTo($permission): void
+    {
+        $this->permissions()->attach($permission);
+    }
 }
