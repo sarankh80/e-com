@@ -45,10 +45,10 @@ class User extends Authenticatable
     {
         return new UserFactory();
     }
-    function hasRole($role): bool
-    {
-        return $this->roles()->where('name', $role)->exists();
-    }
+    // function hasRole($role): bool
+    // {
+    //     return $this->roles()->where('name', $role)->exists();
+    // }
     // function hasPermissionTo($permission): bool
     // {
     //     return $this->permissions()->where('name', $permission)->exists() ||

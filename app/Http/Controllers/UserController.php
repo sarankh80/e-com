@@ -12,106 +12,134 @@ use Spatie\Permission\Models\Permission;
 class UserController extends Controller
 {
     /**
-     * Display a listing of the users.
+     * Display a listing of users.
      */
     public function index()
     {
         $users = User::latest()->paginate(10);
+
         return view('users.index', compact('users'));
     }
 
     /**
-     * Show the form for creating a new user.
+     * Show create form.
      */
     public function create()
     {
-        return view('users.create');
+        $roles = Role::all();
+
+        return view('users.create', compact('roles'));
     }
 
     /**
-     * Store a newly created user in storage.
+     * Store new user.
      */
     public function store(Request $request)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => ['nullable', 'exists:roles,name'],
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        // Assign Role
+        if ($request->filled('role')) {
+            $user->assignRole($request->role);
+        }
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User created successfully.');
     }
 
     /**
-     * Show the form for editing the specified user.
+     * Show edit form.
      */
     public function edit(User $user)
     {
         $roles = Role::all();
         $permissions = Permission::all();
 
-        $userRoles = $user->roles->pluck('name')->toArray();
-        $userPermissions = $user->permissions->pluck('name')->toArray();
+        $userRole = $user->roles->first()?->name;
 
-    return view('users.edit', compact(
-        'user',
-        'roles',
-        'permissions',
-        'userRoles',
-        'userPermissions'
-    ));
+        $userPermissions = $user->permissions
+            ->pluck('name')
+            ->toArray();
+
+        return view('users.edit', compact(
+            'user',
+            'roles',
+            'permissions',
+            'userRole',
+            'userPermissions'
+        ));
     }
 
     /**
-     * Update the specified user in storage.
+     * Update user.
      */
     public function update(Request $request, User $user)
     {
         $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'password' => 'nullable|confirmed|min:6',
-    ]);
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email,' . $user->id],
+            'password' => ['nullable', 'confirmed', 'min:6'],
+            'role' => ['nullable', 'exists:roles,name'],
+            'permissions' => ['nullable', 'array'],
+        ]);
 
-    $data = [
-        'name' => $request->name,
-        'email' => $request->email,
-    ];
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+        ];
 
-    if ($request->filled('password')) {
-        $data['password'] = bcrypt($request->password);
-    }
+        // Update password only if entered
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
 
-    $user->update($data);
+        $user->update($data);
 
-    // Sync Roles
-    $user->syncRoles($request->roles ?? []);
+        // Sync single role
+        if ($request->filled('role')) {
+            $user->syncRoles([$request->role]);
+        } else {
+            $user->syncRoles([]);
+        }
 
-    // Sync Direct Permissions
-    $user->syncPermissions($request->permissions ?? []);
+        // Sync permissions
+        $user->syncPermissions(
+            $request->permissions ?? []
+        );
 
-    return redirect()
-        ->route('users.index')
-        ->with('success', 'User updated successfully.');
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User updated successfully.');
     }
 
     /**
-     * Remove the specified user from storage.
+     * Delete user.
      */
     public function destroy(User $user)
     {
         // Prevent deleting yourself
         if (auth()->id() === $user->id) {
-            return redirect()->route('users.index')->with('error', 'You cannot delete yourself!');
+            return redirect()
+                ->route('users.index')
+                ->with('error', 'You cannot delete yourself!');
         }
 
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User deleted successfully.');
     }
 }
