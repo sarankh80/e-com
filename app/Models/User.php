@@ -49,27 +49,27 @@ class User extends Authenticatable
     {
         return $this->roles()->where('name', $role)->exists();
     }
-    function hasPermissionTo($permission): bool
-    {
-        return $this->permissions()->where('name', $permission)->exists() ||
-               $this->roles()->whereHas('permissions', function ($query) use ($permission) {
-                   $query->where('name', $permission);
-               })->exists();
-    }
-    function permissions()
-    {
-        return $this->belongsToMany(Permission::class, 'model_has_permissions', 'model_id', 'permission_id');
-    }
-    function roles()
-    {
-        return $this->belongsToMany(Role::class, 'model_has_roles', 'model_id', 'role_id');
-    }
-    function assignRole($role): void
-    {
-        $this->roles()->attach($role);
-    }
-    function givePermissionTo($permission): void
-    {
-        $this->permissions()->attach($permission);
-    }
+    // function hasPermissionTo($permission): bool
+    // {
+    //     return $this->permissions()->where('name', $permission)->exists() ||
+    //            $this->roles()->whereHas('permissions', function ($query) use ($permission) {
+    //                $query->where('name', $permission);
+    //            })->exists();
+    // }
+    // function permissions()
+    // {
+    //     return $this->belongsToMany(Permission::class, 'model_has_permissions', 'model_id', 'permission_id');
+    // }
+    // function roles()
+    // {
+    //     return $this->belongsToMany(Role::class, 'model_has_roles', 'model_id', 'role_id');
+    // }
+    // function assignRole($role): void
+    // {
+    //     $this->roles()->attach($role);
+    // }
+    // function givePermissionTo($permission): void
+    // {
+    //     $this->permissions()->attach($permission);
+    // }
 }

@@ -2,57 +2,94 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ __('Users Management') }}
+                {{ __('Roles Management') }}
             </h2>
-            <a href="{{ route('users.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
-                + Add User
+
+            <a href="{{ route('roles.create') }}"
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
+                + Add Role
             </a>
         </div>
     </x-slot>
-<div class="overflow-x-auto bg-white rounded-lg shadow">
-    <table class="w-full text-left border-collapse">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="px-6 py-4 font-bold text-gray-700 uppercase border-b">Role Name</th>
-                <th class="px-6 py-4 font-bold text-gray-700 uppercase border-b">Permissions</th>
-                <th class="px-6 py-4 font-bold text-gray-700 uppercase border-b text-right">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($roles as $role)
-            <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4 border-b">
-                    <span class="font-medium text-gray-900">{{ ucfirst($role->name) }}</span>
-                </td>
-                <td class="px-6 py-4 border-b">
-                    <div class="flex flex-wrap gap-1">
-                        @forelse($role->permissions as $permission)
-                            <span class="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
-                                {{ $permission->name }}
-                            </span>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+
+            @if(session('success'))
+                <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="p-4">#</th>
+                            <th class="p-4">Role Name</th>
+                            <th class="p-4">Permissions</th>
+                            <th class="p-4">Created At</th>
+                            <th class="p-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+                        @forelse($roles as $role)
+                            <tr>
+                                <td class="p-4">{{ $loop->iteration }}</td>
+
+                                <td class="p-4 text-gray-900 dark:text-gray-100">
+                                    {{ $role->name }}
+                                </td>
+
+                                <td class="p-4">
+                                    @foreach($role->permissions as $permission)
+                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs mr-1">
+                                            {{ $permission->name }}
+                                        </span>
+                                    @endforeach
+                                </td>
+
+                                <td class="p-4 text-gray-500">
+                                    {{ $role->created_at->format('M d, Y') }}
+                                </td>
+
+                                <td class="p-4 text-right">
+                                    <a href="{{ route('roles.edit', $role->id) }}"
+                                       class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                        Edit
+                                    </a>
+
+                                    <form action="{{ route('roles.destroy', $role->id) }}"
+                                          method="POST"
+                                          class="inline">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit"
+                                                class="text-red-600 hover:text-red-900"
+                                                onclick="return confirm('Delete this role?')">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                         @empty
-                            <span class="text-xs italic text-gray-400">No permissions assigned</span>
+                            <tr>
+                                <td colspan="5" class="p-4 text-center text-gray-500">
+                                    No roles found.
+                                </td>
+                            </tr>
                         @endforelse
-                    </div>
-                </td>
-                <td class="px-6 py-4 text-right border-b">
-                    @can('edit roles')
-                        <a href="{{ route('roles.edit', $role->id) }}" class="text-blue-600 hover:underline mr-3">Edit</a>
-                    @endcan
-                    
-                    @can('delete roles')
-                        <form action="{{ route('roles.destroy', $role->id) }}" method="POST" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Are you sure?')">
-                                Delete
-                            </button>
-                        </form>
-                    @endcan
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
+                    </tbody>
+                </table>
+
+                <div class="p-4">
+                    {{ $roles->links() }}
+                </div>
+
+            </div>
+        </div>
+    </div>
 </x-app-layout>
