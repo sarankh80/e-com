@@ -1,74 +1,45 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ __('Create Role') }}
-            </h2>
-
-            <a href="{{ route('roles.index') }}"
-               class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded shadow">
-                Back
+        <div class="flex items-center gap-3">
+            <a href="{{ route('roles.index') }}" class="text-gray-400 hover:text-gray-700 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
             </a>
+            <h2 class="text-xl font-bold text-gray-900">Create Role</h2>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-
-                <form action="{{ route('roles.store') }}"
-                      method="POST"
-                      class="p-6 space-y-6">
+    <div class="py-8">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+                <form action="{{ route('roles.store') }}" method="POST" class="p-6 space-y-6">
                     @csrf
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Role Name
-                        </label>
-
-                        <input type="text"
-                               name="name"
-                               value="{{ old('name') }}"
-                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-
-                        @error('name')
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ $message }}
-                            </p>
-                        @enderror
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Role Name</label>
+                        <input type="text" name="name" value="{{ old('name') }}" autofocus
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+                        @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                            Permissions
-                        </label>
-
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Permissions</label>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 bg-gray-50 rounded-lg p-4">
                             @foreach($permissions as $permission)
-                                <label class="flex items-center space-x-2">
-                                    <input type="checkbox"
-                                           name="permissions[]"
-                                           value="{{ $permission->name }}"
-                                           class="rounded border-gray-300 text-blue-600 shadow-sm">
-
-                                    <span class="text-gray-700 dark:text-gray-300">
-                                        {{ $permission->name }}
-                                    </span>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="permissions[]" value="{{ $permission->name }}"
+                                        {{ in_array($permission->name, old('permissions', [])) ? 'checked' : '' }}
+                                        class="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900">
+                                    <span class="text-sm text-gray-700">{{ $permission->name }}</span>
                                 </label>
                             @endforeach
                         </div>
                     </div>
 
-                    <div class="flex justify-end">
-                        <button type="submit"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow">
-                            Save Role
-                        </button>
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                        <a href="{{ route('roles.index') }}" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Cancel</a>
+                        <button type="submit" class="bg-gray-900 hover:bg-black text-white px-6 py-2 rounded-lg text-sm font-semibold transition-colors">Save Role</button>
                     </div>
-
                 </form>
-
             </div>
         </div>
     </div>

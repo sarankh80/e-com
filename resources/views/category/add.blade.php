@@ -1,69 +1,70 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Create Category') }}
-        </h2>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('categories.index') }}" class="text-gray-400 hover:text-gray-700 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            </a>
+            <h2 class="text-xl font-bold text-gray-900">Add Category</h2>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    
-                    <form action="{{ route('categories.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
+    <div class="py-8">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+                <form action="{{ route('categories.store') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
+                    @csrf
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <x-input-label for="name" :value="__('Name (EN)')" />
-                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus />
-                                <x-input-error class="mt-2" :messages="$errors->get('name')" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="name_kh" :value="__('Name (KH)')" />
-                                <x-text-input id="name_kh" name="name_kh" type="text" class="mt-1 block w-full" :value="old('name_kh')" />
-                                <x-input-error class="mt-2" :messages="$errors->get('name_kh')" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="parent_id" :value="__('Parent Category')" />
-                                <select name="parent_id" id="parent_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                    <option value="0">None (Root Category)</option>
-                                    @foreach($parentCategories as $parent)
-                                        <option value="{{ $parent->id }}">{{ $parent->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <x-input-label for="image" :value="__('Category Image')" />
-                                <input id="image" name="image" type="file" class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" />
-                                <x-input-error class="mt-2" :messages="$errors->get('image')" />
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Name (EN)</label>
+                            <input type="text" name="name" value="{{ old('name') }}" required autofocus
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+                            @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                         </div>
 
-                        <div class="mt-6">
-                            <x-input-label for="description" :value="__('Description')" />
-                            <textarea id="description" name="description" rows="3" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('description') }}</textarea>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Name (KH)</label>
+                            <input type="text" name="name_kh" value="{{ old('name_kh') }}"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+                            @error('name_kh')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                         </div>
 
-                        <div class="mt-6 flex items-center">
-                            <input id="is_active" name="is_active" type="checkbox" value="1" checked class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            <label for="is_active" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ __('Active') }}</label>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Parent Category</label>
+                            <select name="parent_id"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white">
+                                <option value="0">None (Root Category)</option>
+                                @foreach($parentCategories as $parent)
+                                    <option value="{{ $parent->id }}" {{ old('parent_id') == $parent->id ? 'selected' : '' }}>{{ $parent->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
-                        <div class="flex items-center justify-end mt-6">
-                            <x-secondary-button onclick="window.history.back()" class="mr-3">
-                                {{ __('Cancel') }}
-                            </x-secondary-button>
-                            <x-primary-button>
-                                {{ __('Save Category') }}
-                            </x-primary-button>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Category Image</label>
+                            <input type="file" name="image"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-500 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-gray-900 file:text-white hover:file:bg-black cursor-pointer">
+                            @error('image')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                         </div>
-                    </form>
+                    </div>
 
-                </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                        <textarea name="description" rows="3"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">{{ old('description') }}</textarea>
+                    </div>
+
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="is_active" value="1" checked
+                            class="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900">
+                        <span class="text-sm font-medium text-gray-700">Active</span>
+                    </label>
+
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                        <button type="button" onclick="window.history.back()" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Cancel</button>
+                        <button type="submit" class="bg-gray-900 hover:bg-black text-white px-6 py-2 rounded-lg text-sm font-semibold transition-colors">Save Category</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

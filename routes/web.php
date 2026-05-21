@@ -3,9 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('front');
-});
+Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/lang/{locale}', function ($locale) {
     if (! in_array($locale, ['en', 'km'])) {
         abort(400);
@@ -15,7 +13,16 @@ Route::get('/lang/{locale}', function ($locale) {
     return redirect()->back();
 });
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $stats = [
+        'products'        => \App\Models\Product::count(),
+        'categories'      => \App\Models\Category::count(),
+        'slides'          => \App\Models\Slide::count(),
+        'users'           => \App\Models\User::count(),
+        'low_stock'       => \App\Models\Product::where('stock', '<=', 5)->count(),
+        'active_products' => \App\Models\Product::where('is_active', true)->count(),
+    ];
+    $recent_products = \App\Models\Product::with('category')->latest()->take(5)->get();
+    return view('dashboard', compact('stats', 'recent_products'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
