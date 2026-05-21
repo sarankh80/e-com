@@ -15,8 +15,7 @@
                 <div class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg text-sm">{{ session('success') }}</div>
             @endif
 
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
                     <table id="roles-table" data-dt class="admin-table">
                         <thead>
                             <tr>

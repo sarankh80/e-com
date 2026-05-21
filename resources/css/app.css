@@ -45,27 +45,59 @@
 
 /* ─── DataTables v2 — LUXE Admin Theme ──────────────────────────── */
 
-/* Wrapper around the table — keep overflow-x working */
-.dt-scroll-body { overflow-x: auto; }
+/* Container fills the card */
+div.dt-container {
+    width: 100% !important;
+}
 
-/* Controls rows (search+length top / info+pagination bottom) */
-.dt-layout-row {
+/* Control rows (search+length / info+pagination) */
+div.dt-container div.dt-layout-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.75rem;
     padding: 0.875rem 1.25rem;
+    margin: 0;
+    width: 100%;
     background: white;
 }
-.dt-layout-row:first-child { border-bottom: 1px solid rgb(243 244 246); }
-.dt-layout-row:last-child  { border-top:    1px solid rgb(243 244 246); }
-.dt-layout-cell { display: flex; align-items: center; }
+div.dt-container div.dt-layout-row:first-child { border-bottom: 1px solid rgb(243 244 246); }
+div.dt-container div.dt-layout-row:last-child  { border-top:    1px solid rgb(243 244 246); }
+
+/* The table row — strip all extra spacing, let table breathe */
+div.dt-container div.dt-layout-row.dt-layout-table {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    overflow-x: auto;
+}
+
+/* The cell wrapping the table — full width, block */
+div.dt-container div.dt-layout-row.dt-layout-table div.dt-layout-cell {
+    display: block !important;
+    width: 100% !important;
+}
+
+/* Flex cells for control rows */
+div.dt-container div.dt-layout-row:not(.dt-layout-table) div.dt-layout-cell {
+    display: flex;
+    align-items: center;
+}
+
+/* Table itself */
+table.dataTable,
+table.admin-table {
+    width: 100% !important;
+    border-collapse: collapse;
+}
+table.dataTable.no-footer { border-bottom: none; }
 
 /* Search */
-.dt-search { display: flex; align-items: center; gap: 0.5rem; }
-.dt-search label { display: none; }          /* hide "Search:" label — placeholder covers it */
-.dt-search input {
+div.dt-container .dt-search { display: flex; align-items: center; gap: 0.5rem; }
+div.dt-container .dt-search label { display: none; }
+div.dt-container .dt-search input {
     border: 1px solid rgb(209 213 219);
     border-radius: 0.5rem;
     padding: 0.4rem 0.875rem;
@@ -74,21 +106,21 @@
     width: 220px;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
-.dt-search input:focus {
+div.dt-container .dt-search input:focus {
     border-color: rgb(17 24 39);
     box-shadow: 0 0 0 3px rgba(17,24,39,0.1);
 }
 
-/* Length selector */
-.dt-length { display: flex; align-items: center; }
-.dt-length label {
+/* Length */
+div.dt-container .dt-length { display: flex; align-items: center; }
+div.dt-container .dt-length label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     font-size: 0.8125rem;
     color: rgb(107 114 128);
 }
-.dt-length select {
+div.dt-container .dt-length select {
     border: 1px solid rgb(209 213 219);
     border-radius: 0.5rem;
     padding: 0.4rem 0.75rem;
@@ -97,15 +129,14 @@
     outline: none;
     cursor: pointer;
 }
-.dt-length select:focus { border-color: rgb(17 24 39); }
+div.dt-container .dt-length select:focus { border-color: rgb(17 24 39); }
 
 /* Info */
-.dt-info { font-size: 0.8125rem; color: rgb(107 114 128); }
+div.dt-container .dt-info { font-size: 0.8125rem; color: rgb(107 114 128); }
 
 /* Pagination */
-.dt-paging { display: flex; align-items: center; gap: 0.125rem; }
-
-.dt-paging-button {
+div.dt-container .dt-paging { display: flex; align-items: center; gap: 0.125rem; }
+div.dt-container .dt-paging .dt-paging-button {
     padding: 0.375rem 0.625rem;
     border-radius: 0.5rem;
     font-size: 0.8125rem;
@@ -118,36 +149,26 @@
     text-align: center;
     line-height: 1;
 }
-.dt-paging-button:hover:not(.disabled) {
+div.dt-container .dt-paging .dt-paging-button:hover:not(.disabled) {
     background-color: rgb(243 244 246);
     color: rgb(17 24 39);
 }
-.dt-paging-button.current,
-.dt-paging-button.current:hover {
+div.dt-container .dt-paging .dt-paging-button.current,
+div.dt-container .dt-paging .dt-paging-button.current:hover {
     background-color: rgb(17 24 39);
     color: white;
 }
-.dt-paging-button.disabled,
-.dt-paging-button.disabled:hover {
+div.dt-container .dt-paging .dt-paging-button.disabled,
+div.dt-container .dt-paging .dt-paging-button.disabled:hover {
     opacity: 0.3;
     cursor: default;
     background: transparent;
 }
 
 /* Sort arrows — white on dark header */
-table.dataTable,
-table.admin-table { width: 100% !important; border-collapse: collapse; }
-table.dataTable.no-footer { border-bottom: none; }
-
-/* Ensure DT wrapper doesn't shrink the table */
-.dt-layout-table,
-.dt-scroll,
-.dt-scroll-body { width: 100% !important; }
-.dt-container { width: 100%; }
-
 table.dataTable thead th.dt-orderable-asc span.dt-column-order::before,
 table.dataTable thead th.dt-orderable-desc span.dt-column-order::before,
-table.dataTable thead th.dt-ordering-asc span.dt-column-order::before,
+table.dataTable thead th.dt-ordering-asc  span.dt-column-order::before,
 table.dataTable thead th.dt-ordering-desc span.dt-column-order::before {
     font-size: 0.65rem;
     margin-left: 0.25rem;
