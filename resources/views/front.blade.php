@@ -21,6 +21,7 @@
         .cart-overlay.active { opacity: 1; pointer-events: auto; }
         .cart-drawer { transform: translateX(100%); transition: transform 0.3s ease-out; }
         .cart-drawer.active { transform: translateX(0); }
+        .booking-input { @apply w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black; }
     </style>
 </head>
 <body class="antialiased bg-white font-['figtree'] text-gray-900">
@@ -67,8 +68,9 @@
                 <div class="hidden md:flex items-center space-x-8">
                     <button onclick="app.setTab('home')" id="nav-home" class="nav-btn text-sm font-medium text-black">{{ __('lang.home') }}</button>
                     <button onclick="app.setTab('shop')" id="nav-shop" class="nav-btn text-sm font-medium text-gray-500 hover:text-black">{{ __('lang.shop') }}</button>
-                    <button class="text-sm font-medium text-gray-500 hover:text-black">{{ __('lang.categories') }}</button>
-                    <button class="text-sm font-medium text-gray-500 hover:text-black">{{ __('lang.about') }}</button>
+                    <button onclick="app.setTab('categories')" id="nav-categories" class="nav-btn text-sm font-medium text-gray-500 hover:text-black">{{ __('lang.categories') }}</button>
+                    <button onclick="app.setTab('about')" id="nav-about" class="nav-btn text-sm font-medium text-gray-500 hover:text-black">{{ __('lang.about') }}</button>
+                    <button onclick="app.setTab('booking')" id="nav-booking" class="nav-btn text-sm font-medium text-gray-500 hover:text-black">Booking</button>
                     @if(app()->getLocale() === 'en')
                         <a href="/lang/km" class="flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-black">
                             <i data-lucide="globe" class="w-5 h-5"> </i> Khmer 
@@ -105,8 +107,8 @@
         <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-100 px-4 py-4 space-y-4">
             <button onclick="app.setTab('home'); app.toggleMenu(false)" class="block w-full text-left text-lg font-medium">Home</button>
             <button onclick="app.setTab('shop'); app.toggleMenu(false)" class="block w-full text-left text-lg font-medium">Shop</button>
-            <button class="block w-full text-left text-lg font-medium">Categories</button>
-            <button class="block w-full text-left text-lg font-medium">Account</button>
+            <button onclick="app.setTab('categories'); app.toggleMenu(false)" class="block w-full text-left text-lg font-medium">Categories</button>
+            <button onclick="app.setTab('account'); app.toggleMenu(false)" class="block w-full text-left text-lg font-medium">Account</button>
         </div>
     </nav>
 
@@ -130,10 +132,24 @@
                     <span>Total</span>
                     <span id="cart-total-value">$0.00</span>
                 </div>
-                <button class="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-800 transition-colors">Checkout Now</button>
+                <button onclick="app.goToBooking()" class="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-800 transition-colors">Checkout Now</button>
             </div>
         </div>
     </div>
+
+    <!-- Booking Success Toast -->
+    @if(session('booking_success'))
+    <div id="booking-success-toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-green-600 text-white px-6 py-4 rounded-2xl shadow-2xl text-sm font-semibold transition-all duration-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>{{ session('booking_success') }}</span>
+        <button onclick="document.getElementById('booking-success-toast').remove()" class="ml-2 opacity-70 hover:opacity-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+    <script>
+        setTimeout(() => { const t = document.getElementById('booking-success-toast'); if (t) t.remove(); }, 5000);
+    </script>
+    @endif
 
     <!-- Main Content -->
     <main>
@@ -227,6 +243,156 @@
                 <!-- Injected via JS -->
             </div>
         </div>
+        <!-- Categories View -->
+        <div id="view-categories" class="view-section hidden-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h1 class="text-4xl font-extrabold mb-8">Categories</h1>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                @foreach($categories as $cat)
+                    <div class="category-card bg-gray-100 rounded-lg p-6 text-center cursor-pointer hover:bg-gray-200" onclick="app.setCategory('{{ $cat }}')">
+                        <h3 class="font-bold text-gray-900">{{ $cat }}</h3>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        <!-- About View -->
+        <div id="view-about" class="view-section hidden-section max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+            <h1 class="text-4xl font-extrabold mb-6">About LUXE.</h1>
+            <p class="text-lg text-gray-600 leading-relaxed mb-6">LUXE. is a modern e-commerce platform built with Laravel 13 and Vanilla JavaScript. We are passionate about delivering high-quality products that blend style and functionality. Our mission is to elevate your everyday life with curated essentials designed for the modern lifestyle.</p>
+            <p class="text-lg text-gray-600 leading-relaxed">From premium wireless headphones to minimalist leather watches, we offer a carefully selected range of products that embody quality craftsmanship and a minimalist aesthetic. Thank you for choosing LUXE. We hope you enjoy shopping with us!</p>
+        </div>
+
+        <!-- Booking View -->
+        <div id="view-booking" class="view-section hidden-section max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h1 class="text-4xl font-extrabold mb-2">Booking</h1>
+            <p class="text-gray-500 mb-10">Fill in your details and confirm your order below.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Customer Form -->
+                <div>
+                    <h2 class="text-xl font-bold mb-6">Your Information</h2>
+                    <form id="booking-form" method="POST" action="{{ route('orders.store') }}" onsubmit="return app.prepareBooking(event)">
+                        @csrf
+                        <input type="hidden" name="order_number" id="booking-order-number">
+                        <input type="hidden" name="items" id="booking-items">
+                        <input type="hidden" name="total_amount" id="booking-total">
+                        <input type="hidden" name="status" value="pending">
+                        <input type="hidden" name="payment_method" id="booking-payment-method" value="cash">
+
+                        <!-- Payment Method -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">Payment Method <span class="text-red-500">*</span></label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <!-- Cash -->
+                                <label id="pay-cash-label" onclick="app.selectPayment('cash')"
+                                    class="pay-method-btn flex items-center gap-3 border-2 border-black bg-black text-white rounded-xl px-4 py-3 cursor-pointer transition-all">
+                                    <span class="text-xl">💵</span>
+                                    <div>
+                                        <p class="font-bold text-sm">Cash</p>
+                                        <p class="text-xs opacity-70">Pay on delivery</p>
+                                    </div>
+                                </label>
+                                <!-- Mastercard -->
+                                <label id="pay-mastercard-label" onclick="app.selectPayment('mastercard')"
+                                    class="pay-method-btn flex items-center gap-3 border-2 border-gray-200 bg-white text-gray-700 rounded-xl px-4 py-3 cursor-pointer transition-all hover:border-gray-400">
+                                    <svg class="w-10 h-6 shrink-0" viewBox="0 0 48 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="48" height="30" rx="4" fill="#f5f5f5"/>
+                                        <circle cx="18" cy="15" r="9" fill="#EB001B" opacity="0.9"/>
+                                        <circle cx="30" cy="15" r="9" fill="#F79E1B" opacity="0.9"/>
+                                        <path d="M24 8.2a9 9 0 0 1 0 13.6A9 9 0 0 1 24 8.2z" fill="#FF5F00"/>
+                                    </svg>
+                                    <div>
+                                        <p class="font-bold text-sm">Mastercard</p>
+                                        <p class="text-xs text-gray-400">Credit / Debit</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Card Details (shown only for Mastercard) -->
+                        <div id="card-details" class="hidden mb-4 bg-gray-50 border border-gray-200 rounded-2xl p-4 space-y-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <p class="text-sm font-bold text-gray-700">Card Details</p>
+                                <svg class="w-10 h-6" viewBox="0 0 48 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="48" height="30" rx="4" fill="#f5f5f5"/>
+                                    <circle cx="18" cy="15" r="9" fill="#EB001B" opacity="0.9"/>
+                                    <circle cx="30" cy="15" r="9" fill="#F79E1B" opacity="0.9"/>
+                                    <path d="M24 8.2a9 9 0 0 1 0 13.6A9 9 0 0 1 24 8.2z" fill="#FF5F00"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Card Number</label>
+                                <input type="text" id="card-number" maxlength="19" placeholder="1234 5678 9012 3456"
+                                    oninput="app.formatCardNumber(this)"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black tracking-widest">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Name on Card</label>
+                                <input type="text" id="card-name" placeholder="JOHN DOE"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black uppercase">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Expiry</label>
+                                    <input type="text" id="card-expiry" maxlength="5" placeholder="MM/YY"
+                                        oninput="app.formatExpiry(this)"
+                                        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">CVV</label>
+                                    <input type="password" id="card-cvv" maxlength="4" placeholder="•••"
+                                        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+                                <input type="text" name="customer_name" required placeholder="John Doe"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Email Address <span class="text-red-500">*</span></label>
+                                <input type="email" name="customer_email" required placeholder="john@example.com"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
+                                <input type="tel" name="customer_phone" placeholder="+1 234 567 890"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Delivery Address <span class="text-red-500">*</span></label>
+                                <textarea name="customer_address" required rows="3" placeholder="123 Main St, City, Country"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black resize-none"></textarea>
+                            </div>
+                        </div>
+
+                        <div id="booking-empty-msg" class="hidden mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-700">
+                            Your cart is empty. <button type="button" onclick="app.setTab('shop')" class="underline font-semibold">Add items</button> before booking.
+                        </div>
+
+                        <button type="submit"
+                            class="mt-8 w-full bg-black text-white py-4 rounded-xl font-bold text-base hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i> Confirm Booking
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Order Summary -->
+                <div>
+                    <h2 class="text-xl font-bold mb-6">Order Summary</h2>
+                    <div id="booking-summary" class="space-y-4 bg-gray-50 rounded-2xl p-6">
+                        <p class="text-gray-400 text-sm text-center py-8">No items in cart yet.</p>
+                    </div>
+                    <div id="booking-total-row" class="hidden flex justify-between items-center mt-4 px-2 pt-4 border-t border-gray-200">
+                        <span class="font-bold text-lg">Total</span>
+                        <span id="booking-total-display" class="font-bold text-xl">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Footer -->
@@ -250,7 +416,8 @@
                 isMenuOpen: false,
                 selectedCategory: 'All',
                 cart: [],
-                selectedProduct: null
+                selectedProduct: null,
+                paymentMethod: 'cash'
             },
 
             init() {
@@ -274,6 +441,7 @@
                     activeBtn.classList.remove('text-gray-500');
                 }
                 window.scrollTo(0, 0);
+                if (tab === 'booking') this.renderBookingSummary();
             },
 
             setCategory(cat) {
@@ -372,6 +540,95 @@
                 `;
                 this.setTab('product-detail');
                 lucide.createIcons();
+            },
+
+            goToBooking() {
+                this.toggleCart(false);
+                this.setTab('booking');
+                this.renderBookingSummary();
+            },
+
+            renderBookingSummary() {
+                const summary = document.getElementById('booking-summary');
+                const totalRow = document.getElementById('booking-total-row');
+                const totalDisplay = document.getElementById('booking-total-display');
+                const emptyMsg = document.getElementById('booking-empty-msg');
+
+                if (this.state.cart.length === 0) {
+                    summary.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">No items in cart yet.</p>';
+                    totalRow.classList.add('hidden');
+                    emptyMsg.classList.remove('hidden');
+                    return;
+                }
+
+                emptyMsg.classList.add('hidden');
+                totalRow.classList.remove('hidden');
+                const total = this.state.cart.reduce((s, i) => s + i.price * i.quantity, 0);
+                totalDisplay.innerText = `$${total.toFixed(2)}`;
+
+                summary.innerHTML = this.state.cart.map(item => `
+                    <div class="flex gap-4 items-center">
+                        <img src="${item.image}" class="w-16 h-20 object-cover rounded-xl bg-gray-100">
+                        <div class="flex-1">
+                            <p class="font-semibold text-sm text-gray-900 leading-snug">${item.name}</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Qty: ${item.quantity}</p>
+                        </div>
+                        <p class="font-bold text-sm">$${(item.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            },
+
+            selectPayment(method) {
+                this.state.paymentMethod = method;
+                document.getElementById('booking-payment-method').value = method;
+                const cashLabel = document.getElementById('pay-cash-label');
+                const cardLabel = document.getElementById('pay-mastercard-label');
+                const cardDetails = document.getElementById('card-details');
+                if (method === 'mastercard') {
+                    cardLabel.className = 'pay-method-btn flex items-center gap-3 border-2 border-black bg-black text-white rounded-xl px-4 py-3 cursor-pointer transition-all';
+                    cashLabel.className = 'pay-method-btn flex items-center gap-3 border-2 border-gray-200 bg-white text-gray-700 rounded-xl px-4 py-3 cursor-pointer transition-all hover:border-gray-400';
+                    cardDetails.classList.remove('hidden');
+                } else {
+                    cashLabel.className = 'pay-method-btn flex items-center gap-3 border-2 border-black bg-black text-white rounded-xl px-4 py-3 cursor-pointer transition-all';
+                    cardLabel.className = 'pay-method-btn flex items-center gap-3 border-2 border-gray-200 bg-white text-gray-700 rounded-xl px-4 py-3 cursor-pointer transition-all hover:border-gray-400';
+                    cardDetails.classList.add('hidden');
+                }
+            },
+
+            formatCardNumber(input) {
+                let v = input.value.replace(/\D/g, '').substring(0, 16);
+                input.value = v.match(/.{1,4}/g)?.join(' ') ?? v;
+            },
+
+            formatExpiry(input) {
+                let v = input.value.replace(/\D/g, '').substring(0, 4);
+                if (v.length >= 3) v = v.substring(0, 2) + '/' + v.substring(2);
+                input.value = v;
+            },
+
+            prepareBooking(e) {
+                if (this.state.cart.length === 0) {
+                    e.preventDefault();
+                    document.getElementById('booking-empty-msg').classList.remove('hidden');
+                    return false;
+                }
+                if (this.state.paymentMethod === 'mastercard') {
+                    const num = document.getElementById('card-number').value.replace(/\s/g, '');
+                    const expiry = document.getElementById('card-expiry').value;
+                    const cvv = document.getElementById('card-cvv').value;
+                    if (num.length < 16 || expiry.length < 5 || cvv.length < 3) {
+                        e.preventDefault();
+                        alert('Please fill in all card details correctly.');
+                        return false;
+                    }
+                }
+                const ts = Date.now();
+                document.getElementById('booking-order-number').value = ts;
+                document.getElementById('booking-items').value = JSON.stringify(this.state.cart);
+                const total = this.state.cart.reduce((s, i) => s + i.price * i.quantity, 0);
+                document.getElementById('booking-total').value = total.toFixed(2);
+                return true;
             },
 
             renderCart() {

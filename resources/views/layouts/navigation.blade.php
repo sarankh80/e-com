@@ -24,6 +24,7 @@
                     @can('view Slides')
                     {!! $navLink('slides.index', 'Slides') !!}
                     @endcan
+                    {!! $navLink('orders.index', 'Orders') !!}
                     {!! $navLink('roles.index', 'Roles') !!}
                     {!! $navLink('permissions.index', 'Permissions') !!}
                     @can('view Users')
@@ -33,6 +34,7 @@
             </div>
 
             <!-- User Dropdown -->
+            @auth
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -61,6 +63,7 @@
                     </x-slot>
                 </x-dropdown>
             </div>
+            @endauth
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
@@ -83,6 +86,9 @@
             @can('view Slides')
             <a href="{{ route('slides.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('slides.index') ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white hover:bg-gray-700' }}">Slides</a>
             @endcan
+            @can('view Order')
+            <a href="{{ route('orders.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('orders.index') ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white hover:bg-gray-700' }}">Orders</a>
+            @endcan
             <a href="{{ route('roles.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('roles.index') ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white hover:bg-gray-700' }}">Roles</a>
             <a href="{{ route('permissions.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('permissions.index') ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white hover:bg-gray-700' }}">Permissions</a>
             @can('view Users')
@@ -90,6 +96,7 @@
             @endcan
         </div>
 
+        @auth
         <div class="pt-4 pb-3 border-t border-gray-700 px-4">
             <div class="flex items-center gap-3 mb-3">
                 <div class="w-9 h-9 bg-white text-gray-900 rounded-full flex items-center justify-center font-bold text-sm uppercase">
@@ -108,5 +115,6 @@
                 </form>
             </div>
         </div>
+        @endauth
     </div>
 </nav>

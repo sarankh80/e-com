@@ -37,4 +37,14 @@ Route::resource('users', \App\Http\Controllers\UserController::class)->middlewar
 Route::resource('roles', \App\Http\Controllers\RoleController::class)->middleware('auth');
 Route::resource('permissions', \App\Http\Controllers\PermissionController::class)->middleware('auth');
 
+Route::get('/checkout', [\App\Http\Controllers\OrderController::class, 'checkout'])
+    ->name('checkout');
+Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'index'])
+    ->name('orders.index');
+Route::get('/create', [\App\Http\Controllers\OrderController::class, 'create'])
+    ->name('orders.create');
+Route::get('/edit/{id}', [\App\Http\Controllers\OrderController::class, 'edit'])
+    ->name('orders.edit');
+Route::post('/orders/store', [\App\Http\Controllers\OrderController::class, 'store'])
+    ->name('orders.store');
 require __DIR__.'/auth.php';

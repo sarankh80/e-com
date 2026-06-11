@@ -11,6 +11,8 @@ class ProductController extends Controller
 {
     public function index()
     {
+        $cartItems = session('cart', []);
+
         $products = Product::with('category')->latest()->get();
         return view('product.index', compact('products'));
     }
