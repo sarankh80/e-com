@@ -14,4 +14,11 @@ class PurchaseController extends Controller
         $purchases = Purchase::with('product', 'user')->get();
         return view('purchase.index', compact('purchases'));
     }
+
+    function create()
+    {
+        $products = Product::all();
+        $users = User::all();
+        return view('purchase.create', compact('products', 'users'));
+    }
 }

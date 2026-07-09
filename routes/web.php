@@ -50,3 +50,4 @@ Route::post('/orders/store', [\App\Http\Controllers\OrderController::class, 'sto
     ->name('orders.store');
 Route::get('purchases', [\App\Http\Controllers\PurchaseController::class, 'index'])->name('purchases.index');
 require __DIR__.'/auth.php';
+Route::get('/purchases/create', [\App\Http\Controllers\PurchaseController::class, 'create'])->name('purchases.create');
