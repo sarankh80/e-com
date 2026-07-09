@@ -19,6 +19,7 @@
                         $navLink = fn($route, $label) => '<a href="' . route($route) . '" class="px-3 py-2 rounded-lg text-sm font-medium transition-colors ' . (request()->routeIs($route) ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white hover:bg-gray-800') . '">' . $label . '</a>';
                     @endphp
                     {!! $navLink('dashboard', 'Dashboard') !!}
+                    {!! $navLink('purchases.index', 'Purchases') !!}
                     {!! $navLink('products.index', 'Products') !!}
                     {!! $navLink('categories.index', 'Categories') !!}
                     @can('view Slides')
@@ -81,6 +82,7 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-gray-800">
         <div class="px-4 pt-3 pb-3 space-y-1">
             <a href="{{ route('dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('dashboard') ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white hover:bg-gray-700' }}">Dashboard</a>
+            <a href="{{ route('purchases.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('purchases.index') ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white hover:bg-gray-700' }}">Purchases</a>
             <a href="{{ route('products.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('products.index') ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white hover:bg-gray-700' }}">Products</a>
             <a href="{{ route('categories.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('categories.index') ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white hover:bg-gray-700' }}">Categories</a>
             @can('view Slides')

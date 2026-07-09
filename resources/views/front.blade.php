@@ -530,7 +530,7 @@
                                 <p class="text-gray-500 font-medium uppercase tracking-widest text-xs">${product.category}</p>
                                 <h1 class="text-4xl font-extrabold text-gray-900">${product.name}</h1>
                             </div>
-                            <p class="text-3xl font-bold text-black">$${product.price.toFixed(2)}</p>
+                            <p class="text-3xl font-bold text-black">$${parseFloat(product.price).toFixed(2)}</p>
                             <p class="text-lg text-gray-600 leading-relaxed">${product.description}</p>
                             <button onclick='app.addToCart(${JSON.stringify(product)})' class="w-full bg-black text-white py-5 rounded-2xl font-bold text-lg hover:bg-gray-800 transition-all">
                                 Add to Shopping Cart

@@ -2,74 +2,39 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
 
-    /**
-     * The attributes that are mass assignable.
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $fillable = ['name', 'email', 'password', 'phone', 'avatar', 'is_admin'];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
-    /**
-     * The attributes that should be cast.
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'password'          => 'hashed',
+        'is_admin'          => 'boolean',
     ];
-    function factory(): UserFactory
+
+    public function cart()             { return $this->hasOne(Cart::class); }
+    public function orders()           { return $this->hasMany(Order::class); }
+    public function wishlist()         { return $this->hasMany(Wishlist::class); }
+    public function reviews()          { return $this->hasMany(ProductReview::class); }
+    public function addresses()        { return $this->hasMany(ShippingAddress::class); }
+    public function defaultAddress()   { return $this->hasOne(ShippingAddress::class)->where('is_default', true); }
+
+    public function getAvatarUrlAttribute(): string
     {
-        return new UserFactory();
+        if ($this->avatar) return asset('storage/' . $this->avatar);
+        $hash = md5(strtolower(trim($this->email)));
+        return "https://www.gravatar.com/avatar/{$hash}?d=mp&s=80";
     }
-    // function hasRole($role): bool
-    // {
-    //     return $this->roles()->where('name', $role)->exists();
-    // }
-    // function hasPermissionTo($permission): bool
-    // {
-    //     return $this->permissions()->where('name', $permission)->exists() ||
-    //            $this->roles()->whereHas('permissions', function ($query) use ($permission) {
-    //                $query->where('name', $permission);
-    //            })->exists();
-    // }
-    // function permissions()
-    // {
-    //     return $this->belongsToMany(Permission::class, 'model_has_permissions', 'model_id', 'permission_id');
-    // }
-    // function roles()
-    // {
-    //     return $this->belongsToMany(Role::class, 'model_has_roles', 'model_id', 'role_id');
-    // }
-    // function assignRole($role): void
-    // {
-    //     $this->roles()->attach($role);
-    // }
-    // function givePermissionTo($permission): void
-    // {
-    //     $this->permissions()->attach($permission);
-    // }
+
+    function factory(): UserFactory { return new UserFactory(); }
 }

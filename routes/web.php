@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
 });
 Route::resource('products', \App\Http\Controllers\ProductController::class)->middleware('auth');
 Route::resource('categories', \App\Http\Controllers\CategoryController::class)->middleware('auth');
@@ -47,4 +48,5 @@ Route::get('/edit/{id}', [\App\Http\Controllers\OrderController::class, 'edit'])
     ->name('orders.edit');
 Route::post('/orders/store', [\App\Http\Controllers\OrderController::class, 'store'])
     ->name('orders.store');
+Route::get('purchases', [\App\Http\Controllers\PurchaseController::class, 'index'])->name('purchases.index');
 require __DIR__.'/auth.php';
